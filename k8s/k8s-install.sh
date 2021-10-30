@@ -1,5 +1,6 @@
 # k8s-install.sh
 # handy script to install k8s on ubuntu 
+# run as sudo user on all k8s cluster nodes
 # By Robert Wang @github.com/robertluwang
 # Oct 30, 2021
 
