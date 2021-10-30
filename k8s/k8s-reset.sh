@@ -1,5 +1,6 @@
 # k8s-reset.sh
 # handy script to reset k8s cluster on ubuntu 
+# run as sudo user on master node
 # By Robert Wang @github.com/robertluwang
 # Oct 30, 2021
 
