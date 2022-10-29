@@ -1,2 +1,2 @@
-# nativecloud
-native cloud note, script, template collection etc
+# nativecloud-miniguide
+A minimal native cloud guide: note, script, template collection etc
