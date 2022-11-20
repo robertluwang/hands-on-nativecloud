@@ -22,4 +22,4 @@ echo 'alias k=kubectl' >>~/.bashrc
 echo 'complete -F __start_kubectl k' >>~/.bashrc
 echo "export do='--dry-run=client -o yaml'" >>~/.bashrc
 
-echo === $(date) Provisioning - k8s-install.sh $1 by $(whoami) end
+echo === $(date) Provisioning - k8s-install.sh by $(whoami) end
