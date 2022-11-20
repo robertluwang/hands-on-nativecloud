@@ -9,9 +9,9 @@ echo === $(date) Provisioning - k8s-reset.sh $1 by $(whoami) start
 sudo kubeadm reset -f
 date
 if [ -z "$1" ];then
-    sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem | tee /tmp/kubeadm.log
+    sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem | tee /var/tmp/kubeadm.log
 else
-    sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=$1 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem | tee /tmp/kubeadm.log
+    sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=$1 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem | tee /var/tmp/kubeadm.log
 fi
 # allow normal user to run kubectl
 if [ -d $HOME/.kube ]; then
