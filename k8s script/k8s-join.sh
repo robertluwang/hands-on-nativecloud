@@ -14,9 +14,9 @@ curl -Lo $HOME/.ssh/vagrant https://raw.githubusercontent.com/hashicorp/vagrant/
 chmod 0600 $HOME/.ssh/vagrant
 
 # join cluster
-scp -q -o "StrictHostKeyChecking no" -i $HOME/.ssh/vagrant master:/tmp/kubeadm.log  /tmp/kubeadm.log
-token=$(cat /tmp/kubeadm.log |grep "kubeadm join"|head -1 |awk -Ftoken '{print $2}'|awk '{print $1}')
-certhash=$(cat /tmp/kubeadm.log |grep discovery-token-ca-cert-hash|tail -1|awk '{print $2}')
+scp -q -o "StrictHostKeyChecking no" -i $HOME/.ssh/vagrant master:/var/tmp/kubeadm.log  /var/tmp/kubeadm.log
+token=$(cat /var/tmp/kubeadm.log |grep "kubeadm join"|head -1 |awk -Ftoken '{print $2}'|awk '{print $1}')
+certhash=$(cat /var/tmp/kubeadm.log |grep discovery-token-ca-cert-hash|tail -1|awk '{print $2}')
 
 sudo kubeadm join master:6443 --token $token \
   --discovery-token-ca-cert-hash $certhash
