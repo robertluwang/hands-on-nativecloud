@@ -44,9 +44,9 @@ echo === $(date) Provisioning - nic $1 by $(whoami) end
 
 SCRIPT
 
-$dockerInstall = <<SCRIPT
+$dockerServer = <<SCRIPT
 
-echo === $(date) Provisioning - dockerInstall by $(whoami) start
+echo === $(date) Provisioning - dockerServer by $(whoami) start
 
 sudo apt-get update -y
 sudo apt-get install -y ca-certificates curl gnupg lsb-release
@@ -77,7 +77,7 @@ sudo systemctl enable docker
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 
-echo === $(date) Provisioning - dockerInstall by $(whoami) end
+echo === $(date) Provisioning - dockerServer by $(whoami) end
 
 SCRIPT
 
@@ -125,6 +125,8 @@ sudo sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd
 sudo systemctl daemon-reload
 sudo systemctl enable cri-docker.service
 sudo systemctl enable --now cri-docker.socket
+sleep 30
+sudo systemctl restart cri-docker.service
 
 echo === $(date) Provisioning - cri-dockerd by $(whoami) end
 
@@ -133,6 +135,8 @@ SCRIPT
 $k8sInit = <<SCRIPT
 
 # $1 - master/api server ip 
+
+echo === $(date) Provisioning - k8sInit $1 by $(whoami) start
 
 if [ -z "$1" ];then
     sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem --cri-socket unix:///var/run/cri-dockerd.sock | tee /var/tmp/kubeadm.log
@@ -162,6 +166,8 @@ SCRIPT
 $k8sJoin = <<SCRIPT
 # $1 - master/api server ip
 
+echo === $(date) Provisioning - k8sJoin $1 by $(whoami) start
+
 sudo sed -i '/master/d' /etc/hosts
 sudo sed -i "1i$1 master" /etc/hosts
 
@@ -170,13 +176,9 @@ curl -Lo $HOME/.ssh/vagrant https://raw.githubusercontent.com/hashicorp/vagrant/
 chmod 0600 $HOME/.ssh/vagrant
 
 # join cluster
-scp -q -o "StrictHostKeyChecking no" -i $HOME/.ssh/vagrant master:/var/tmp/kubeadm.log  /var/tmp/kubeadm.log
-token=$(cat /var/tmp/kubeadm.log |grep "kubeadm join"|head -1 |awk -Ftoken '{print $2}'|awk '{print $1}')
-certhash=$(cat /var/tmp/kubeadm.log |grep discovery-token-ca-cert-hash|tail -1|awk '{print $2}')
+JOINTOKEN=$(ssh -q -o "StrictHostKeyChecking no" -i $HOME/.ssh/vagrant master kubeadm token create --print-join-command)
 
-sudo kubeadm join master:6443 --token $token \
-  --discovery-token-ca-cert-hash $certhash \
-  --cri-socket unix:///var/run/cri-dockerd.sock 
+sudo $JOINTOKEN --cri-socket unix:///var/run/cri-dockerd.sock
 
 # allow normal user to run kubectl
 if [ -d $HOME/.kube ]; then
@@ -194,6 +196,7 @@ Vagrant.configure("2") do |config|
   config.vm.box = "roboxes/ubuntu2204"
   config.ssh.insert_key = false
   config.vm.box_check_update = false
+  config.vm.network "public_network", bridge: "myNATSW"
 
   config.vm.define "master" do |master|
       master.vm.hostname = "master"
@@ -203,7 +206,7 @@ Vagrant.configure("2") do |config|
           v.cpus = 1
       end
       master.vm.provision "shell", inline: $nic, args: "192.168.80.20", privileged: false
-      master.vm.provision "shell", inline: $dockerInstall, privileged: false
+      master.vm.provision "shell", inline: $dockerServer, privileged: false
       master.vm.provision "shell", inline: $k8sInstall, privileged: false
       master.vm.provision "shell", inline: $criDockerd, privileged: false
       master.vm.provision "shell", inline: $k8sInit, args: "192.168.80.20", privileged: false
@@ -216,8 +219,9 @@ Vagrant.configure("2") do |config|
           v.cpus = 1
       end
       worker.vm.provision "shell", inline: $nic, args: "192.168.80.30", privileged: false
-      worker.vm.provision "shell", inline: $dockerInstall, privileged: false
+      worker.vm.provision "shell", inline: $dockerServer, privileged: false
       worker.vm.provision "shell", inline: $k8sInstall, privileged: false
+      worker.vm.provision "shell", inline: $criDockerd, privileged: false
       worker.vm.provision "shell", inline: $k8sJoin, args: "192.168.80.20", privileged: false
   end
 end

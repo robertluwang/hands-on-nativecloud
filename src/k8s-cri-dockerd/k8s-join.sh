@@ -1,6 +1,6 @@
 # k8s-join.sh
 # handy script to join k8s cluster on ubuntu
-# run on worker node
+# run on k8s worker node
 # By Robert Wang @github.com/robertluwang
 # Nov 21, 2022
 # $1 - master/api server ip
@@ -15,13 +15,9 @@ curl -Lo $HOME/.ssh/vagrant https://raw.githubusercontent.com/hashicorp/vagrant/
 chmod 0600 $HOME/.ssh/vagrant
 
 # join cluster
-scp -q -o "StrictHostKeyChecking no" -i $HOME/.ssh/vagrant master:/var/tmp/kubeadm.log  /var/tmp/kubeadm.log
-token=$(cat /var/tmp/kubeadm.log |grep "kubeadm join"|head -1 |awk -Ftoken '{print $2}'|awk '{print $1}')
-certhash=$(cat /var/tmp/kubeadm.log |grep discovery-token-ca-cert-hash|tail -1|awk '{print $2}')
+JOINTOKEN=$(ssh -q -o "StrictHostKeyChecking no" -i $HOME/.ssh/vagrant master kubeadm token create --print-join-command)
 
-sudo kubeadm join master:6443 --token $token \
-  --discovery-token-ca-cert-hash $certhash \
-  --cri-socket unix:///var/run/cri-dockerd.sock 
+sudo $JOINTOKEN --cri-socket unix:///var/run/cri-dockerd.sock
 
 # allow normal user to run kubectl
 if [ -d $HOME/.kube ]; then

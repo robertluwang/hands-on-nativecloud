@@ -1,6 +1,6 @@
 # docker-server.sh
 # handy script to install docker on ubuntu 
-# run on k8s master node only
+# run on k8s cluster node (master/worker)
 # By Robert Wang @github.com/robertluwang
 # Nov 21, 2022
 

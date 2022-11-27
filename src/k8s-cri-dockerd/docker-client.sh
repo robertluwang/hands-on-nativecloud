@@ -1,6 +1,6 @@
 # docker-client.sh
 # handy script to install docker client on ubuntu 
-# run on k8s worker node
+# run on ubuntu workstation
 # By Robert Wang @github.com/robertluwang
 # Nov 21, 2022
 

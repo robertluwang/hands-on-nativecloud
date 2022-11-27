@@ -1,6 +1,6 @@
 # cri-dockerd.sh
 # handy script to install cri-dockerd on ubuntu 
-# run on k8s master node only
+# run on k8s cluster node (master/worker)
 # By Robert Wang @github.com/robertluwang
 # Nov 26, 2022
 
