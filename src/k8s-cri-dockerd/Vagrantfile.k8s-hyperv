@@ -195,6 +195,7 @@ SCRIPT
 
 Vagrant.configure("2") do |config|
   config.vm.box = "roboxes/ubuntu2204"
+  config.vm.provision "shell", inline: "sudo timedatectl set-timezone America/Montreal", privileged: false, run: "always"
   config.ssh.insert_key = false
   config.vm.box_check_update = false
   config.vm.network "public_network", bridge: "myNATSW"
