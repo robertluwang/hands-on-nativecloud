@@ -1,11 +1,11 @@
-# k8s-join.sh
+# k8s-join-worker.sh
 # handy script to join k8s cluster on ubuntu
 # run on k8s worker node
 # By Robert Wang @github.com/robertluwang
 # Nov 21, 2022
 # $1 - master/api server ip
 
-echo === $(date) Provisioning - k8s-join.sh $1 by $(whoami) start
+echo === $(date) Provisioning - k8s-join-worker.sh $1 by $(whoami) start
 
 sudo sed -i '/master/d' /etc/hosts
 sudo sed -i "1i$1 master" /etc/hosts
@@ -27,4 +27,4 @@ mkdir -p $HOME/.kube
 scp -q -o "StrictHostKeyChecking no" -i $HOME/.ssh/vagrant master:$HOME/.kube/config $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-echo === $(date) Provisioning - k8s-join.sh $1 by $(whoami) end
+echo === $(date) Provisioning - k8s-join-worker.sh $1 by $(whoami) end

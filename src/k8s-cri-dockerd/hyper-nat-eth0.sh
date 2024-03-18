@@ -1,10 +1,10 @@
-# nat-eth0.sh
-# handy script to setup static nic eth0 on ubuntu 
+# hyper-nat-eth0.sh
+# handy script to setup static nic eth0 on hyper-v ubuntu 
 # By Robert Wang @github.com/robertluwang
 # Oct 30, 2021
 # $1 - static nic ip on NAT hyper-v switch 
 
-echo === $(date) Provisioning - nat-eth0 $1 by $(whoami) start  
+echo === $(date) Provisioning - hyper-nat-eth0 $1 by $(whoami) start  
 
 SUBNET=$(echo $1 | cut -d"." -f1-3)
 
@@ -44,4 +44,4 @@ ip addr
 ip route
 ping -c 2 google.ca
 
-echo === $(date) Provisioning - nat-eth0 $1 by $(whoami) end
+echo === $(date) Provisioning - hyper-nat-eth0 $1 by $(whoami) end
